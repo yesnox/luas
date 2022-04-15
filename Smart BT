@@ -1,0 +1,29 @@
+local ref = gui.Reference("Legitbot", "Other", "Extra")
+local box = gui.Checkbox(ref, "box", "Smart BT", false)
+local boxbox = gui.Checkbox(ref, "bobox", "Log To Console", false) -- when you hit the player it slows them down and prints twice to console idk how to fix that
+local slider = gui.Slider(ref, "slider", "Value Multiplier", 4, 1, 6)
+slider:SetDescription("Higher the number lower the backtrack")
+boxbox:SetDescription("dont ask why it prints like that i dont know")
+
+callbacks.Register("AimbotTarget",function(player)
+        local envel = math.floor(Vector3(
+                player:GetPropFloat("localdata", "m_vecVelocity[0]"),
+                player:GetPropFloat("localdata", "m_vecVelocity[1]"),
+                player:GetPropFloat("localdata", "m_vecVelocity[2]")
+            ):Length2D())
+
+        local mathshiz = math.abs(((math.max(0, (math.min(400, (envel))))) - 400) / slider:GetValue())
+        local printshit = math.floor(mathshiz)
+        
+        if envel ~= nil and box:GetValue() then
+            gui.SetValue("lbot.extra.backtrack", mathshiz)
+        else
+            return
+        end
+        if boxbox:GetValue() then
+            print("BT[" .. printshit .. "]")
+        else
+            return
+        end
+    end
+)
