@@ -1,0 +1,68 @@
+local ref = gui.Reference("Ragebot", "Accuracy", "Position Adjustment")
+local checkbox = gui.Checkbox(ref, "checkbox", "Dynamic Hitchance", false)
+local slidermax = gui.Slider(ref, "slidermax", "Maximum Accuracy %", 80, 0, 100)
+local slidermin = gui.Slider(ref, "slidermin", "Minimum Accuracy %", 40, 0, 100)
+slidermax:SetDescription("setting this value lower than the min will break it")
+slidermin:SetDescription("setting this value higher than the max will break it")
+
+local shot = 0
+local hit = 0
+
+client.AllowListener("player_hurt")
+client.AllowListener("weapon_fire")
+
+
+local function guia()
+    if checkbox:GetValue() then
+        slidermax:SetInvisible(false)
+        slidermin:SetInvisible(false)
+    else
+        slidermax:SetInvisible(true)
+        slidermin:SetInvisible(true)
+    end
+end
+
+callbacks.Register("FireGameEvent", "Events", function(e)
+        local weapon = entities.GetLocalPlayer():GetPropEntity("m_hActiveWeapon")
+
+        if e:GetName() == "player_hurt" then
+            if
+                client.GetPlayerIndexByUserID(e:GetInt("attacker")) == client.GetLocalPlayerIndex() and
+                    client.GetPlayerIndexByUserID(e:GetInt("userid")) ~= client.GetLocalPlayerIndex()
+             then
+                if tostring(weapon) == "weapon_scar20" or tostring(weapon) == "weapon_g3sg1" then
+                    hit = hit + 1
+                end
+            end
+        end
+        if e:GetName() == "weapon_fire" then
+            if client.GetPlayerIndexByUserID(e:GetInt("userid")) == client.GetLocalPlayerIndex() then
+                if tostring(weapon) == "weapon_scar20" or tostring(weapon) == "weapon_g3sg1" then
+                    shot = shot + 1
+                end
+            end
+        end
+
+        local percent = hit / shot * 100
+
+        if
+            e:GetName() == "weapon_fire" and
+                client.GetPlayerIndexByUserID(e:GetInt("userid")) == client.GetLocalPlayerIndex()
+         then
+            if percent < slidermin:GetValue() and checkbox:GetValue() then
+                gui.SetValue(
+                    "rbot.accuracy.weapon.asniper.hitchance",
+                    (gui.GetValue("rbot.accuracy.weapon.asniper.hitchance") + 1)
+                )
+            elseif percent > slidermax:GetValue() and checkbox:GetValue() then
+                gui.SetValue(
+                    "rbot.accuracy.weapon.asniper.hitchance",
+                    (gui.GetValue("rbot.accuracy.weapon.asniper.hitchance") - 1)
+                )
+            end
+        end
+    end)
+
+
+    callbacks.Register("Draw", guia)
+
