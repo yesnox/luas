@@ -1,0 +1,17 @@
+local ref = gui.Reference("Ragebot", "Anti-Aim", "Extra")
+local check = gui.Checkbox(ref, "check", "Fake Desync", false)
+
+local function predlol()
+
+    if check:GetValue() then
+        if globals.TickCount() % 5 == 0 then
+            gui.SetValue("rbot.antiaim.base", "180 Desync")
+            gui.SetValue("rbot.antiaim.base.rotation", 1)
+            gui.SetValue("rbot.antiaim.advanced.antialign", 1)
+        else
+            gui.SetValue("rbot.antiaim.base", "180 Backward")
+        end
+    end
+end
+
+callbacks.Register("Draw", predlol)
